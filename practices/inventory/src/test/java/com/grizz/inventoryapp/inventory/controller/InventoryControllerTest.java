@@ -4,7 +4,9 @@ import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
+@WebMvcTest
 public class InventoryControllerTest {
 
     @DisplayName("재고 조회")
