@@ -1,13 +1,20 @@
 package com.grizz.inventoryapp.inventory.controller;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest
+@WebMvcTest(InventoryController.class)
 public class InventoryControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @DisplayName("재고 조회")
     @Nested
@@ -15,6 +22,7 @@ public class InventoryControllerTest {
         @DisplayName("자산(상품)이 존재하지 않을 경우, 404 status와 error를 반환한다.")
         @Test
         void test1() {
+            assertNull(mockMvc);
             throw new NotImplementedTestException();
         }
 
