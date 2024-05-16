@@ -70,6 +70,11 @@ public class InventoryServiceTest {
     class DecreaseByItemId {
         final String existingItemId = "1";
         final Long stock = 100L;
+
+        @BeforeEach
+        void setUpAll() {
+            inventoryJpaRepository.addInventoryEntity(existingItemId, stock);
+        }
         @DisplayName("qunatity가 음수라면, Exception을 throw한다.")
         @Test
         void test1() {
