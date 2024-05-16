@@ -6,11 +6,11 @@ import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
 import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
-import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class InventoryService {
+
     private final InventoryJpaRepository inventoryJpaRepository;
 
     public InventoryService(InventoryJpaRepository inventoryJpaRepository) {
@@ -19,11 +19,11 @@ public class InventoryService {
 
     public @Nullable Inventory findByItemId(@NotNull String itemId) {
         return inventoryJpaRepository.findByItemId(
-            itemId).map(this::mapToDomain)
+                itemId).map(this::mapToDomain)
             .orElse(null);
     }
 
-    public @NotNull Inventory descreasByItemId(@NotNull String itemId, @NotNull Long quantity) {
+    public @NotNull Inventory decreaseByItemId(@NotNull String itemId, @NotNull Long quantity) {
         if (quantity < 0) {
             throw new InvalidDecreaseQuantityException();
         }
@@ -42,6 +42,17 @@ public class InventoryService {
         if (quantity > entity.getStock()) { // 재고가 부족하면?
             throw new InsufficientStockException();
         }
+
+        final Integer updateCount = inventoryJpaRepository.decreaseStock(itemId, quantity);
+        if (updateCount == 0) {
+            throw new ItemNotFoundException();
+        }
+
+/*        // updateCount가 1이라는 것을 가정
+        final Inventory inventory = inventoryJpaRepository.findByItemId(
+                itemId).map(this::mapToDomain)
+            .orElse(null);
+        return inventory;*/
 
         return null;
     }

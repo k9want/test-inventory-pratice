@@ -23,4 +23,9 @@ public class InventoryJpaRepositoryStub implements InventoryJpaRepository {
             .filter(entity -> entity.getItemId().equals(itemId))
             .findFirst();
     }
+
+    @Override
+    public @NotNull Integer decreaseStock(@NotNull String itemId, @NotNull Long quantity) {
+        return null;
+    }
 }
