@@ -5,6 +5,7 @@ import com.grizz.inventoryapp.inventory.repository.entity.InventoryEntity;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
 import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
+import com.grizz.inventoryapp.inventory.service.exception.InvalidStockException;
 import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +54,19 @@ public class InventoryService {
             .orElseThrow(ItemNotFoundException::new);
 
         return mapToDomain(inventory);
+    }
+
+    public @NotNull Inventory updateStock(@NotNull String itemId, @NotNull Long stock) {
+        if (stock < 0) {
+            throw new InvalidStockException();
+        }
+
+        final InventoryEntity entity = inventoryJpaRepository.findByItemId(itemId)
+            .orElseThrow(ItemNotFoundException::new);
+
+        entity.setStock(stock);
+
+        return mapToDomain(inventoryJpaRepository.save(entity));
     }
 
     private Inventory mapToDomain(InventoryEntity entity) {

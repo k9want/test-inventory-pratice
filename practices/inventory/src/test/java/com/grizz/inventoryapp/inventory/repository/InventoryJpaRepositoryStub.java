@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.NotNull;
 
 public class InventoryJpaRepositoryStub implements InventoryJpaRepository {
+
     // db 연결 x -> in memory를 통해 (stub)
     private final List<InventoryEntity> inventoryEntities = new ArrayList<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
@@ -38,5 +39,28 @@ public class InventoryJpaRepositoryStub implements InventoryJpaRepository {
         entity.setStock(entity.getStock() - quantity);
 
         return 1;
+    }
+
+    @Override
+    public @NotNull InventoryEntity save(@NotNull InventoryEntity inventoryEntity) {
+        final Long entityId = inventoryEntity.getId();
+        final Optional<InventoryEntity> optionalEntity = inventoryEntities.stream()
+            .filter(entity -> entity.getId() != null && entity.getId().equals(entityId))
+            .findFirst();
+
+        InventoryEntity entity;
+        if (optionalEntity.isPresent()) {
+            entity = optionalEntity.get();
+            entity.setStock(inventoryEntity.getStock());
+        } else {
+            final Long id = idGenerator.getAndIncrement();
+            entity = new InventoryEntity(
+                id,
+                inventoryEntity.getItemId(),
+                inventoryEntity.getStock()
+            );
+            inventoryEntities.add(inventoryEntity);
+        }
+        return entity;
     }
 }

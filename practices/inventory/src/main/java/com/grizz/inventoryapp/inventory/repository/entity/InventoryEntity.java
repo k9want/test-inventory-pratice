@@ -23,6 +23,10 @@ public class InventoryEntity {
         return stock;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setStock(@NotNull Long stock) {
         this.stock = stock;
     }
