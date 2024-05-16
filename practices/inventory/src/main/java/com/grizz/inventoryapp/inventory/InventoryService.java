@@ -48,13 +48,11 @@ public class InventoryService {
             throw new ItemNotFoundException();
         }
 
-/*        // updateCount가 1이라는 것을 가정
-        final Inventory inventory = inventoryJpaRepository.findByItemId(
-                itemId).map(this::mapToDomain)
-            .orElse(null);
-        return inventory;*/
+        // updateCount가 1이라는 것을 가정
+        final InventoryEntity inventory = inventoryJpaRepository.findByItemId(itemId)
+            .orElseThrow(ItemNotFoundException::new);
 
-        return null;
+        return mapToDomain(inventory);
     }
 
     private Inventory mapToDomain(InventoryEntity entity) {
