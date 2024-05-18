@@ -1,5 +1,10 @@
 package com.grizz.inventoryapp.common.controller.dto;
 
-public class InventoryResponse {
+import org.jetbrains.annotations.NotNull;
+
+public record InventoryResponse(
+    @NotNull String itemId,
+    @NotNull Long stock
+) {
 
 }
