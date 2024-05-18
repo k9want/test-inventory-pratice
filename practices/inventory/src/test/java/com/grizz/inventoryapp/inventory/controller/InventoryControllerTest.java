@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.grizz.inventoryapp.config.JsonConfig;
 import com.grizz.inventoryapp.inventory.InventoryService;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
@@ -19,10 +20,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-
+@Import(JsonConfig.class)
 @WebMvcTest(InventoryController.class)
 public class InventoryControllerTest {
 
@@ -64,7 +66,7 @@ public class InventoryControllerTest {
             final JsonNode responseBody = objectMapper.readTree(content);
             final JsonNode errorField = responseBody.get("error");
             assertNotNull(errorField);
-            assertEquals(404, errorField.get("code").asInt());
+            assertEquals(1000, errorField.get("code").asInt());
             assertEquals("자산이 존재하지 않습니다.", errorField.get("local_message").asText());
         }
 
