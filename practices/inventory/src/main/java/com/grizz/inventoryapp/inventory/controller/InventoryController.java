@@ -4,6 +4,7 @@ import com.grizz.inventoryapp.common.controller.ApiResponse;
 import com.grizz.inventoryapp.common.controller.dto.InventoryResponse;
 import com.grizz.inventoryapp.common.controller.exception.CommonInventoryHttpException;
 import com.grizz.inventoryapp.inventory.InventoryService;
+import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,15 +27,11 @@ public class InventoryController {
         final Inventory inventory = inventoryService.findByItemId(itemId);
         if (inventoryService.findByItemId(itemId) == null) {
             throw new CommonInventoryHttpException(
-                "자산이 존재하지 않습니다.",
-                1000L,
+                ErrorCodes.ITEM_NOT_FOUND,
                 HttpStatus.NOT_FOUND);
         }
 
-        return new ApiResponse<>(
-            new InventoryResponse(inventory.getItemId(), inventory.getStock())
-            , null);
-
-
+        return ApiResponse.just(
+            InventoryResponse.fromDomain(inventory));
     }
 }

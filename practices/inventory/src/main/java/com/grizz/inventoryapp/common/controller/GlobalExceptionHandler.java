@@ -15,11 +15,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleCommonInventoryHttpException(
         CommonInventoryHttpException exception
     ) {
-        final ApiResponse<Void> body = new ApiResponse<>(
-            null,
-            new ApiErrorResponse(exception.getLocalMessage(), exception.getCode())
+        final ApiResponse<Void> body = ApiResponse.fromErrorCodes(
+            exception.getErrorCodes()
         );
-
         final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8);
         final HttpStatus status = exception.getStatus();
 

@@ -6,5 +6,4 @@ public record ApiErrorResponse(
     @NotNull String localMessage,
     @NotNull Long code
 ) {
-
 }
