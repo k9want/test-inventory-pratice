@@ -1,17 +1,18 @@
 package com.grizz.inventoryapp.inventory.controller;
 
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertMvcDataEquals;
+import static com.grizz.inventoryapp.test.assertion.Assertions.assertMvcErrorEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.grizz.inventoryapp.config.JsonConfig;
 import com.grizz.inventoryapp.inventory.InventoryService;
+import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.DisplayName;
@@ -58,17 +59,9 @@ public class InventoryControllerTest {
                 .andReturn();
 
             // then
-            final String content = result.getResponse().getContentAsString();
-
-            // $.error.code = 404
-            // $.error.local_message = "자산이 존재하지 않습니다."
-
-            final JsonNode responseBody = objectMapper.readTree(content);
-            final JsonNode errorField = responseBody.get("error");
-            assertNotNull(errorField);
-            assertEquals(1000, errorField.get("code").asInt());
-            assertEquals("자산이 존재하지 않습니다.", errorField.get("local_message").asText());
+            assertMvcErrorEquals(result, ErrorCodes.ITEM_NOT_FOUND);
         }
+
 
         @DisplayName("정상인 경우, 200 status와 결과를 반환한다.")
         @Test
@@ -85,17 +78,10 @@ public class InventoryControllerTest {
                 .andReturn();
 
             // then
-            final String content = result.getResponse().getContentAsString();
-
-            // $.data.item_id = {itemId}
-            // $.data.stock = {stock}
-
-            final JsonNode responseBody = objectMapper.readTree(content);
-            final JsonNode dataField = responseBody.get("data");
-
-            assertNotNull(dataField);
-            assertEquals(itemId, dataField.get("item_id").asText());
-            assertEquals(stock, dataField.get("stock").asLong());
+            assertMvcDataEquals(result, dataField -> {
+                assertEquals(itemId, dataField.get("item_id").asText());
+                assertEquals(stock, dataField.get("stock").asLong());
+            });
         }
     }
 
