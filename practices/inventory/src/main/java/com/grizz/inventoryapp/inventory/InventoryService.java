@@ -28,15 +28,7 @@ public class InventoryService {
         if (quantity < 0) {
             throw new InvalidDecreaseQuantityException();
         }
-        // before
-//        final Optional<InventoryEntity> optionalEntity = inventoryJpaRepository.findByItemId(itemId);
-//        if (optionalEntity.isEmpty()) {
-//            throw new ItemNotFoundException();
-//        }
-//
-//        final InventoryEntity entity = optionalEntity.get();
 
-        // after
         final InventoryEntity entity = inventoryJpaRepository.findByItemId(itemId)
             .orElseThrow(ItemNotFoundException::new);
 

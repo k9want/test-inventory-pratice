@@ -1,4 +1,4 @@
-package com.grizz.inventoryapp.common.controller.dto;
+package com.grizz.inventoryapp.inventory.controller.dto;
 
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
 import org.jetbrains.annotations.NotNull;

@@ -154,8 +154,6 @@ public class InventoryControllerTest {
 
             // then
             assertMvcErrorEquals(result, ErrorCodes.INVALID_DECREASE_QUANTITY);
-
-            throw new NotImplementedTestException();
         }
 
         @DisplayName("정상인 경우, 200 status와 결과를 반환한다.")
@@ -163,7 +161,7 @@ public class InventoryControllerTest {
         void test1000() throws Exception {
             // given
             final Inventory inventory = new Inventory(itemId, stock);
-            given(inventoryService.decreaseByItemId(itemId, stock))
+            given(inventoryService.decreaseByItemId(itemId, quantity))
                 .willReturn(inventory);
 
             // when
