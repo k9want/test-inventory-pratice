@@ -5,6 +5,7 @@ import static com.grizz.inventoryapp.test.assertion.Assertions.assertMvcErrorEqu
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -14,6 +15,9 @@ import com.grizz.inventoryapp.config.JsonConfig;
 import com.grizz.inventoryapp.inventory.InventoryService;
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
+import com.grizz.inventoryapp.inventory.service.exception.InsufficientStockException;
+import com.grizz.inventoryapp.inventory.service.exception.InvalidDecreaseQuantityException;
+import com.grizz.inventoryapp.inventory.service.exception.ItemNotFoundException;
 import com.grizz.inventoryapp.test.exception.NotImplementedTestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -88,28 +93,93 @@ public class InventoryControllerTest {
     @DisplayName("재고 차감")
     @Nested
     class DecreaseQuantity {
+        final String itemId = "1";
+        final Long quantity = 10L;
+        final Long stock = 90L;
         @DisplayName("자산(상품)이 존재하지 않을 경우, 404 status와 error를 반환한다.")
         @Test
-        void test1() {
-            throw new NotImplementedTestException();
+        void test1() throws Exception {
+            // given
+            given(inventoryService.decreaseByItemId(itemId, quantity))
+                .willThrow(ItemNotFoundException.class);
+
+            // when
+            final String requestBody = "{\"quantity\": " + quantity + "}";
+            final MvcResult result = mockMvc.perform(
+                    post("/api/v1/inventory/{itemId}/decrease", itemId)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+            // then
+            assertMvcErrorEquals(result, ErrorCodes.ITEM_NOT_FOUND);
         }
 
         @DisplayName("재고가 부족할 경우, 404 status와 error를 반환한다.")
         @Test
-        void test2() {
-            throw new NotImplementedTestException();
+        void test2() throws Exception {
+            // given
+            given(inventoryService.decreaseByItemId(itemId, quantity))
+                .willThrow(InsufficientStockException.class);
+
+            // when
+            final String requestBody = "{\"quantity\": " + quantity + "}";
+            final MvcResult result = mockMvc.perform(
+                    post("/api/v1/inventory/{itemId}/decrease", itemId)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+            // then
+            assertMvcErrorEquals(result, ErrorCodes.INSUFFICIENT_STOCK);
         }
 
         @DisplayName("차감 수량이 유효하지 않은 경우, 404 status와 error를 반환한다.")
         @Test
-        void test3() {
+        void test3() throws Exception {
+            // given
+            given(inventoryService.decreaseByItemId(itemId, quantity))
+                .willThrow(InvalidDecreaseQuantityException.class);
+
+            // when
+            final String requestBody = "{\"quantity\": " + quantity + "}";
+            final MvcResult result = mockMvc.perform(
+                    post("/api/v1/inventory/{itemId}/decrease", itemId)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+            // then
+            assertMvcErrorEquals(result, ErrorCodes.INVALID_DECREASE_QUANTITY);
+
             throw new NotImplementedTestException();
         }
 
         @DisplayName("정상인 경우, 200 status와 결과를 반환한다.")
         @Test
-        void test1000() {
-            throw new NotImplementedTestException();
+        void test1000() throws Exception {
+            // given
+            final Inventory inventory = new Inventory(itemId, stock);
+            given(inventoryService.decreaseByItemId(itemId, stock))
+                .willReturn(inventory);
+
+            // when
+            final String requestBody = "{\"quantity\": " + quantity + "}";
+            final MvcResult result = mockMvc.perform(
+                    post("/api/v1/inventory/{itemId}/decrease", itemId)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+            // then
+            assertMvcDataEquals(result, dataField -> {
+                assertEquals(itemId, dataField.get("item_id").asText());
+                assertEquals(stock, dataField.get("stock").asLong());
+            });
         }
     }
 
