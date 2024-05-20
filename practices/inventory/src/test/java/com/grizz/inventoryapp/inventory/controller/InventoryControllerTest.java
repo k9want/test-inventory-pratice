@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.grizz.inventoryapp.config.JsonConfig;
+import com.grizz.inventoryapp.fixture.InventoryFixture;
 import com.grizz.inventoryapp.inventory.InventoryService;
 import com.grizz.inventoryapp.inventory.controller.consts.ErrorCodes;
 import com.grizz.inventoryapp.inventory.service.domain.Inventory;
@@ -73,7 +74,7 @@ public class InventoryControllerTest {
         void test1000() throws Exception {
 
             // given
-            final Inventory inventory = new Inventory(itemId, stock);
+            final Inventory inventory = InventoryFixture.sampleInventory(itemId, null);
             given(inventoryService.findByItemId(itemId))
                 .willReturn(inventory);
 
@@ -85,7 +86,7 @@ public class InventoryControllerTest {
             // then
             assertMvcDataEquals(result, dataField -> {
                 assertEquals(itemId, dataField.get("item_id").asText());
-                assertEquals(stock, dataField.get("stock").asLong());
+                assertEquals(inventory.getStock(), dataField.get("stock").asLong());
             });
         }
     }
@@ -96,7 +97,6 @@ public class InventoryControllerTest {
 
         final String itemId = "1";
         final Long quantity = 10L;
-        final Long stock = 90L;
 
         @DisplayName("자산(상품)이 존재하지 않을 경우, 404 status와 error를 반환한다.")
         @Test
@@ -162,7 +162,7 @@ public class InventoryControllerTest {
         @Test
         void test1000() throws Exception {
             // given
-            final Inventory inventory = new Inventory(itemId, stock);
+            final Inventory inventory = InventoryFixture.sampleInventory(itemId, null);
             given(inventoryService.decreaseByItemId(itemId, quantity))
                 .willReturn(inventory);
 
@@ -178,7 +178,7 @@ public class InventoryControllerTest {
             // then
             assertMvcDataEquals(result, dataField -> {
                 assertEquals(itemId, dataField.get("item_id").asText());
-                assertEquals(stock, dataField.get("stock").asLong());
+                assertEquals(inventory.getStock(), dataField.get("stock").asLong());
             });
         }
     }
@@ -234,7 +234,7 @@ public class InventoryControllerTest {
         @Test
         void test1000() throws Exception {
             // given
-            final Inventory inventory = new Inventory(itemId, stock);
+            final Inventory inventory = InventoryFixture.sampleInventory(itemId, stock);;
             given(inventoryService.updateStock(itemId, stock))
                 .willReturn(inventory);
 
