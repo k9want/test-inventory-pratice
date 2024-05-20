@@ -60,30 +60,37 @@ public class InventoryJpaRepositoryTest {
 
     @Nested
     class DecreaseStock { // query annotation
+        final String existingItemId = "1";
+        final String nonExistingItemId = "2";
         @DisplayName("itemId를 갖는 entity가 없다면 0을 반환한다.")
         @Test
         void test1() {
-            throw new NotImplementedTestException();
-
             //given
+            final Long quantity = 10L;
 
             //when
+            final Integer result = sut.decreaseStock(nonExistingItemId, quantity);
 
             //then
-            
+            assertEquals(0, result);
+
         }
-        
+
         @Test
         @DisplayName("itemId를 갖는 entity가 있다면 1을 반환한다.")
         void test2() {
-            throw new NotImplementedTestException();
-
             //given
+            final Long quantity = 10L;
 
             //when
+            final Integer result = sut.decreaseStock(existingItemId, quantity);
 
             //then
-            
+            assertEquals(1, result);
+
+            final InventoryEntity entity = sut.findByItemId(existingItemId).get();
+            assertEquals(100 - quantity, entity.getStock());
+
         }
     }
 
